@@ -17,13 +17,19 @@ func Test_toggleTodoItem(t *testing.T) {
 		AddWithId(102, "Two")
 	initialHtml := renderTemplate("index.tmpl", model, "/")
 
+	t.Log("Installing playwright deps. It can take some time.")
+	err := playwright.Install()
+	if err != nil {
+		t.Fatal("could not install playwright deps")
+	}
+
 	// open the browser page with Playwright
 	page := openPage()
 	defer page.Close()
 	logActivity(page)
 
 	// stub network calls
-	err := page.Route("**", func(route playwright.Route) {
+	err = page.Route("**", func(route playwright.Route) {
 		if route.Request().URL() == "http://localhost:4567/index.html" {
 			// serve the initial HTML
 			stubResponse(route, initialHtml.String(), "text/html")
